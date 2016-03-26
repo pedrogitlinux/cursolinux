@@ -19,6 +19,7 @@ done 2>error1.log
 
 M=0
 for archivo in  `find &DATOS -name "*.xls"`
+do
 	let M=M+1
 	echo "Dando formato al archivo de datos: $archivo"
 	cat $archivo | awk -F "\",\"" '{print $1 " " $2 " " $3 " " $4 " " $5}' | grep -v Sensor | sed '1, $ s/"//g' > $SALIDA_DATOS/datos-$M.out
