@@ -18,7 +18,7 @@ do
 done 2>error1.log
 
 M=0
-for archivo in  `find &DATOS -name "*.xls"`
+for archivo in `find $SALIDA_DATOS -name "*.csv"`
 do
 	let M=M+1
 	echo "Dando formato al archivo de datos: $archivo"
