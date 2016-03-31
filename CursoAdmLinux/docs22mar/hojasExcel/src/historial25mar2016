@@ -1,0 +1,59 @@
+    1  cd CursoAdmLinux/
+    2  tree
+    3  ls
+    4  tree
+    5  cd docs22mar/
+    6  tree
+    7  ls
+    8  dir
+    9  tree
+   10  cd ..
+   11  tree
+   12  history
+   13  tree docs22mar/
+   14  $USER
+   15  echo "Usuario $USER y ccompu $hostname"
+   16  echo "Usuario $USER y compu $HOSTNAMEe"
+   17  echo "Usuario $USER y compu $HOSTNAME"
+   18  git remote add origin https://github.com/pedrogitlinux/cursolinux.git
+   19  git push -u origin master
+   20  git status
+   21  cd docs22mar/hojasExcel/src/
+   22  ./graficar.sh
+   23  sudo ./graficar.sh
+   24  tree
+   25  graficar.sh
+   26* sudo ./graficar.shbash/ 
+   27  bash/ graficar.sh
+   28  bash graficar.sh
+   29  ls
+   30  tree
+   31  ../ tree
+   32  tree ../
+   33  cd ..
+   34  ls
+   35  cd src/
+   36  git status
+   37  git commit
+   38  git add
+   39  git add grsficar.sh
+   40  git add graficar.sh
+   41  git commit
+   42  git status
+   43  git branch prueba
+   44  git log --online --decorate
+   45  git log --decorate
+   46  git log --oneline --decorate
+   47  git checkout prueba
+   48  git remote add origin https://github.com/pedrogitlinux/cursolinux.git
+   49  git remote add prueba https://github.com/pedrogitlinux/cursolinux.git
+   50  git push -u prueba master
+   51  git push -u prueba prueba
+   52  cat history
+   53  history
+   54  git branch -v
+   55  git branch --merged
+   56  git log --oneline --decorate --graph --all
+   57  ls
+   58  cat error1.log 
+   59  history > historial25mar2016
