@@ -44,6 +44,9 @@ done 2>error1.log
 M=0
 
 # Inicia el ciclo FOR que lee los archivos CSV y les quita los datos que se le indican
+# Las comas (,) de la primera fila la convierte en la palabra "Servicios" para que sea 
+# eliminada la fila.
+# Imprime solo 2 columnas y a "head" se le indica que muestre solo 2 filas
 # Incrementa contador, muestra mensaje, lee archivo y elimina comillas. La salida la envía a archivo
 for archivo in `find $SALIDA_DATOS -name "*.csv"`
 do
@@ -119,6 +122,6 @@ OPCION=true
 # Inicia ciclo que se ejecuta función "menu" mientras la variable sea verdadera
 while [ ${OPCION} ]
 do
-	menu
+	xlsTOcsv
 done
 
