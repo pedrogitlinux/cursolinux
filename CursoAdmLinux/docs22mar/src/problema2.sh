@@ -3,13 +3,15 @@
 # Este programa contiene 3 funciones y un ciclo WHILE:
 #
 # 1- Función "xlsTOcsv"
-# Esta función covierte archivos Excel (xls) a archivos de texto (csv) y después
-# procesa los archivos CSV para quitarle datos y dejar solo los datos útiles.
-# 2- Función "discTest"
-# Esta función lee el uso del disco duro y según el porcentaje de uso, muestra un
-# mensaje informativo o de alerta. El mensaje puede ser enviado por correo.
-# 3- Función "menu"
-# Esta función muestra un menú y captura lo que el usuario seleccione para ejecutar una
+#  Esta función covierte archivos Excel (xls) a archivos de texto (csv) y después
+#  procesa los archivos CSV para quitarle datos y dejar solo los datos útiles.
+# 2- Función "graficaLuz"
+#  Esta función crea una gráfica con gnuplot del consumo eléctrico de los
+#  primeros 3 meses.
+# 3- Función "graficAgua"
+#  Esta función grafica el consumo de agua de los 6 meses
+# 4- Función "menu"
+#  Esta función muestra un menú y captura lo que el usuario seleccione para ejecutar una
 # de las funciones anteriores o "SALIR" de la aplicación. El menú se vuelve a mostrar
 # después de cada función, o si realiza una selección inválida, hasta que seleccione "SALIR".
 # WHILE: Ejecuta el menú mientras el usuario no seleccione salir del programa.
@@ -19,13 +21,21 @@
 # Este script extrae archivos de excel y grafica datos
 
 function xlsTOcsv {
-# Variables que definen los directorios donde se leerán los archivos y escribirán los nuevos
+# Variables que definen los directorios donde se leerán los archivos y donde se 
+# escribirán los nuevos
 DATOS=../problema2
 
 SALIDA_DATOS=$DATOS/datos_csv
 
-# Crea directorio donde gurdar nuevos archivos
-# mkdir $SALIDA_DATOS
+# SI el directorio no existe,lo crea para guardar nuevos archivos
+if [ -a $SALIDA_DATOS ]
+then
+	echo ""
+	echo "Archivo existe. No es necesario crearlo"
+	echo ""
+else
+	mkdir $SALIDA_DATOS
+fi
 
 # Variable numérica que utiliza para leer el nombre de archivos y crear nuevos, la inicializa en 0
 M=0
@@ -61,27 +71,25 @@ exit 0
 # ----- INICIO DE FUNCION -----
 # Script para probar el tamaño en el disco duro.
 
-function discTest {
-# Se define variable que guardará información de utilización de particiones del disco.
-# Se filtran datos para tomar solo el valor más alto
-espacio=`df | awk '{print $5}' | grep -v Usados | sort -n | tail -1 | cut -d "%" -f1` 
+function graficaLuz {
+# 
+# 
 
-# Inicia CASE que determina en función del valor obtenido, cual mensaje se mostrará
-case $espacio in 
-	[1-9]|[1-2]?)
-		MENSAJE="Uso bajo de almacenamiento. Tamaño = $espacio%";;
-	[3-5]?)
-		MENSAJE="Hay una partición medio llena. Tamaño = $espacio%";;
-	[6-7]?)
-		MENSAJE="El sistema pronto colapsará. Tamaño = $espacio%";;
-	[8-10]?)
-		MENSAJE="NO HAY SISTEMA DE ARCHIVOS!!! "
-esac
-
-# Muestra mensaje
-echo "Reporte uso de disco: $MENSAJE "
 
 }
+
+
+# ----- INICIO DE FUNCION -----
+# Script para graficar el consumo eléctrico.
+
+function graficAgua {
+# 
+# 
+
+
+}
+
+
 
 # ----- INICIO DE FUNCION -----
 # El siguiente código contiene el menú que se repite hasta que se elija SALIR
@@ -91,8 +99,9 @@ function menu {
 # Se muestran las opciones al usuario
 echo ""
 echo "Para seleccionar una de las siguientes opciones, digite: "
-echo " 1- Nada "
-echo " 2- Para realizar una conversión de archivos Excel a CSV "
+echo " 1- Para realizar una conversión de archivos Excel a CSV "
+echo " 2- Para Graficar 3 meses de consumo eléctrico "
+echo " 3- Para Graficar 6 meses de consumo de agua "
 echo " 0- Para SALIR "
 # Se captura lo que digita el usuario y se guarda en variable NUM
 echo -n "Su selección es: ";	read NUM
@@ -102,10 +111,10 @@ echo ""
 # dependiendo del valor introducido por el usuario
 case $NUM in
 	1)
-		echo "Selección inválida. Vuelva a seleccionar "
+		 xlsTOcsv
 	;;
 	2)
-		xlsTOcsv
+		echo "Selección inválida. Vuelva a seleccionar "
 	;;
 	0)
 		echo "Ha seleccionado SALIR"
