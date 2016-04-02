@@ -25,7 +25,7 @@ DATOS=../problema2
 SALIDA_DATOS=$DATOS/datos_csv
 
 # Crea directorio donde gurdar nuevos archivos
-mkdir $SALIDA_DATOS
+# mkdir $SALIDA_DATOS
 
 # Variable numérica que utiliza para leer el nombre de archivos y crear nuevos, la inicializa en 0
 M=0
@@ -49,9 +49,10 @@ for archivo in `find $SALIDA_DATOS -name "*.csv"`
 do
 	let M=M+1
 	echo "Dando formato al archivo de datos: $archivo"
-	cat $archivo | awk -F "\",\"" '{print $1 " " $2 " " $3 " " $4 " " $5}' | grep -v Sensor | sed '1, $ s/"//g'| HEAD > $SALIDA_DATOS/datos-$M.out
+	cat $archivo | sed '1, 1 s/,/Servicios/g' | awk -F "\",\"" '{print $1 " " $2}' | grep -v Servicios| sed '1, 10 s/"//g' | sed '1, 10 s/,//g' | head --lines=2 > $SALIDA_DATOS/datos-$M.out
 # La información de error que se genera se envía a error2.log
 done 2> error2.log
+exit 0
 }
 
 # ----- INICIO DE FUNCION -----
@@ -65,24 +66,17 @@ espacio=`df | awk '{print $5}' | grep -v Usados | sort -n | tail -1 | cut -d "%"
 # Inicia CASE que determina en función del valor obtenido, cual mensaje se mostrará
 case $espacio in 
 	[1-9]|[1-2]?)
-		MENSAJE="Uso bajo de almacenamiento. Tamaño = $espacio%"
-	;;
+		MENSAJE="Uso bajo de almacenamiento. Tamaño = $espacio%";;
 	[3-5]?)
-		MENSAJE="Hay una partición medio llena. Tamaño = $espacio%"
-	;;
+		MENSAJE="Hay una partición medio llena. Tamaño = $espacio%";;
 	[6-7]?)
-		MENSAJE="El sistema pronto colapsará. Tamaño = $espacio%"
-	;;
+		MENSAJE="El sistema pronto colapsará. Tamaño = $espacio%";;
 	[8-10]?)
 		MENSAJE="NO HAY SISTEMA DE ARCHIVOS!!! "
 esac
 
 # Muestra mensaje
 echo "Reporte uso de disco: $MENSAJE "
-
-# LA FUNCION mail DA ERROR. ES NECESARIO RECONFIGURAR
-# echo $MENSAJE | mail -s "Reporte de espacio en disco `date`" pedro.miranda@ucr.ac.cr
-# echo $MENSAJE | mail -s "Reporte de espacio en disco `date`" sysadmin
 
 }
 
@@ -94,7 +88,7 @@ function menu {
 # Se muestran las opciones al usuario
 echo ""
 echo "Para seleccionar una de las siguientes opciones, digite: "
-echo " 1- Para realizar un test del Disco duro "
+echo " 1- Nada "
 echo " 2- Para realizar una conversión de archivos Excel a CSV "
 echo " 0- Para SALIR "
 # Se captura lo que digita el usuario y se guarda en variable NUM
@@ -105,7 +99,7 @@ echo ""
 # dependiendo del valor introducido por el usuario
 case $NUM in
 	1)
-		discTest
+		echo "Selección inválida. Vuelva a seleccionar "
 	;;
 	2)
 		xlsTOcsv
