@@ -3,14 +3,14 @@
 # Este programa contiene 3 funciones y un ciclo WHILE:
 #
 # 1- Función "xlsTOcsv"
-#  Esta función covierte archivos Excel (xls) a archivos de texto (csv) y después
-#  procesa los archivos CSV para quitarle datos y dejar solo los datos útiles.
-# 2- Función "graficaLuz"
+#  Esta función covierte 
+#	- archivos Excel (xls) a archivos de texto (csv)
+#       - después procesa los archivos CSV para quitarle datos y dejar solo los datos útiles.
+#	- crea los archivos agua.dat y luz.dat que serán usados para graficar
+# 2- Función "graficar"
 #  Esta función crea una gráfica con gnuplot del consumo eléctrico de los
-#  primeros 3 meses.
-# 3- Función "graficAgua"
-#  Esta función grafica el consumo de agua de los 6 meses
-# 4- Función "menu"
+#  primeros 3 meses y del consumo de agua de 6 meses.
+# 3- Función "menu"
 #  Esta función muestra un menú y captura lo que el usuario seleccione para ejecutar una
 # de las funciones anteriores o "SALIR" de la aplicación. El menú se vuelve a mostrar
 # después de cada función, o si realiza una selección inválida, hasta que seleccione "SALIR".
@@ -28,13 +28,20 @@ DATOS=../problema2
 SALIDA_DATOS=$DATOS/datos_csv
 NUEVA_SALIDA=$DATOS/datos_out
 
-mkdir $NUEVA_SALIDA
-
+# SI el directorio no existe,lo crea para guardar nuevos archivos
+if [ -a $NUEVA_SALIDA ]
+then
+        echo ""
+        echo "Archivo $NUEVA_SALIDA existe. No es necesario crearlo"
+        echo ""
+else 
+	mkdir $NUEVA_SALIDA
+fi 
 # SI el directorio no existe,lo crea para guardar nuevos archivos
 if [ -a $SALIDA_DATOS ]
 then
 	echo ""
-	echo "Archivo existe. No es necesario crearlo"
+	echo "Archivo $SALIDA_DATOS existe. No es necesario crearlo"
 	echo ""
 else
 	mkdir $SALIDA_DATOS
@@ -53,66 +60,43 @@ do
 # La información de error que se genera se envía a error1.log
 done 2>error1.log
 
-# Reseteamos la variable a 0
+# Reseteamos la variable a 0 y creamos variable para utilizar en el IF
 M=0
+LIMITE=4
 
 # Inicia el ciclo FOR que lee los archivos CSV y les quita los datos que se le indican
 # Las comas (,) de la primera fila la convierte en la palabra "Servicios" para que sea 
 # eliminada la fila.
 # Imprime solo 2 columnas y a "head" se le indica que muestre solo 2 filas
 # Incrementa contador, muestra mensaje, lee archivo y elimina comillas. La salida la envía a archivo
+# Lee los datos de los archivos para crear nuevos con datos del consumo de 
+# agua y luz.
+
 for archivo in `find $SALIDA_DATOS -name "*.csv"`
 do
 	let M=M+1
 	echo "Dando formato al archivo de datos: $archivo"
 	cat $archivo | sed '1, 1 s/,/Servicios/g' | awk -F "\",\"" '{print $1 " " $2}' | grep -v Servicios| sed '1, 10 s/"//g' | sed '1, 10 s/,//g' | head --lines=2 > $NUEVA_SALIDA/datos-$M.out
-	cat $NUEVA_SALIDA/datos-$M.out | grep -i Luz | sed '1, 3 s/Luz/'$M'/g' >> $NUEVA_SALIDA/luz.out
-	cat $NUEVA_SALIDA/datos-$M.out | grep -i Agua | sed '1, 6 s/Agua/2/g' >> $NUEVA_SALIDA/agua.out
+	if [ ${M} -lt ${LIMITE} ]
+	then
+	cat $NUEVA_SALIDA/datos-$M.out | grep -i Luz | sed '1, 3 s/Luz/'$M'/g' >> luz.out
+	fi
+	cat $NUEVA_SALIDA/datos-$M.out | grep -i Agua | sed '1, 6 s/Agua/'$M'/g' >> agua.out
 # La información de error que se genera se envía a error2.log
 done 2> error2.log
 exit 0
 }
 
 # ----- INICIO DE FUNCION -----
-# Script para probar el tamaño en el disco duro.
+# Script para graficar consumo de Agua y Luz
 
-function graficaLuz {
+function graficar {
 # 
 #
  
-M=1
-for archivo in `find $NUEVA_SALIDA -name "*.out"`
-do
-#        let M=M+1
-        echo "$M Dando formato al archivo de datos: $archivo"
-		cat $archivo | grep -i Luz > $NUEVA_SALIDA/prueba.out
-	if [ ${M} -gt 3 ]; then
-		echo "Cerrando..."
-		exit 0
-	else
-		echo "$M"
-	fi
-        let M=M+1
-# La información de error que se genera se envía a error2.log
-done 2> error3.log
-exit 0
-
-
-        echo ""
-
-}
-
-
-# ----- INICIO DE FUNCION -----
-# Script para graficar el consumo eléctrico.
-
-function graficAgua {
-# 
-# 
 	echo ""
 
 }
-
 
 
 # ----- INICIO DE FUNCION -----
@@ -156,6 +140,5 @@ OPCION=true
 while [ ${OPCION} ]
 do
 	xlsTOcsv
-#	graficaLuz
 done
 
