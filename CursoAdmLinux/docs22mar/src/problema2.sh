@@ -26,6 +26,9 @@ function xlsTOcsv {
 DATOS=../problema2
 
 SALIDA_DATOS=$DATOS/datos_csv
+NUEVA_SALIDA=$DATOS/datos_out
+
+mkdir $NUEVA_SALIDA
 
 # SI el directorio no existe,lo crea para guardar nuevos archivos
 if [ -a $SALIDA_DATOS ]
@@ -62,7 +65,9 @@ for archivo in `find $SALIDA_DATOS -name "*.csv"`
 do
 	let M=M+1
 	echo "Dando formato al archivo de datos: $archivo"
-	cat $archivo | sed '1, 1 s/,/Servicios/g' | awk -F "\",\"" '{print $1 " " $2}' | grep -v Servicios| sed '1, 10 s/"//g' | sed '1, 10 s/,//g' | head --lines=2 > $SALIDA_DATOS/datos-$M.out
+	cat $archivo | sed '1, 1 s/,/Servicios/g' | awk -F "\",\"" '{print $1 " " $2}' | grep -v Servicios| sed '1, 10 s/"//g' | sed '1, 10 s/,//g' | head --lines=2 > $NUEVA_SALIDA/datos-$M.out
+	cat $NUEVA_SALIDA/datos-$M.out | grep -i Luz | sed '1, 3 s/Luz/'$M'/g' >> $NUEVA_SALIDA/luz.out
+	cat $NUEVA_SALIDA/datos-$M.out | grep -i Agua | sed '1, 6 s/Agua/2/g' >> $NUEVA_SALIDA/agua.out
 # La información de error que se genera se envía a error2.log
 done 2> error2.log
 exit 0
@@ -73,8 +78,27 @@ exit 0
 
 function graficaLuz {
 # 
-# 
+#
+ 
+M=1
+for archivo in `find $NUEVA_SALIDA -name "*.out"`
+do
+#        let M=M+1
+        echo "$M Dando formato al archivo de datos: $archivo"
+		cat $archivo | grep -i Luz > $NUEVA_SALIDA/prueba.out
+	if [ ${M} -gt 3 ]; then
+		echo "Cerrando..."
+		exit 0
+	else
+		echo "$M"
+	fi
+        let M=M+1
+# La información de error que se genera se envía a error2.log
+done 2> error3.log
+exit 0
 
+
+        echo ""
 
 }
 
@@ -85,7 +109,7 @@ function graficaLuz {
 function graficAgua {
 # 
 # 
-
+	echo ""
 
 }
 
@@ -132,5 +156,6 @@ OPCION=true
 while [ ${OPCION} ]
 do
 	xlsTOcsv
+#	graficaLuz
 done
 
