@@ -79,22 +79,41 @@ do
 	cat $archivo | sed '1, 1 s/,/Servicios/g' | awk -F "\",\"" '{print $1 " " $2}' | grep -v Servicios| sed '1, 10 s/"//g' | sed '1, 10 s/,//g' | head --lines=2 > $NUEVA_SALIDA/datos-$M.out
 	if [ ${M} -lt ${LIMITE} ]
 	then
-	cat $NUEVA_SALIDA/datos-$M.out | grep -i Luz | sed '1, 3 s/Luz/'$M'/g' >> luz.out
+	cat $NUEVA_SALIDA/datos-$M.out | grep -i Luz | sed '1, 3 s/Luz/'$M'/g' >> luz.dat
 	fi
-	cat $NUEVA_SALIDA/datos-$M.out | grep -i Agua | sed '1, 6 s/Agua/'$M'/g' >> agua.out
+	cat $NUEVA_SALIDA/datos-$M.out | grep -i Agua | sed '1, 6 s/Agua/'$M'/g' >> agua.dat
 # La información de error que se genera se envía a error2.log
 done 2> error2.log
 exit 0
 }
 
 # ----- INICIO DE FUNCION -----
-# Script para graficar consumo de Agua y Luz
-
-function graficar {
+# Script para graficar consumo de Agua y Luz usando Gnuplot
 # 
-#
+function graficar {
+SALIDA_GRAFICA="graficoAguaLuz.png"
+# SI los archivos existen se ejecuta, sino informa que los debe crear
+if [ -a luz.dat ] && [ -a agua.dat ]
+then
+	gnuplot << EOF 2> error.log
+	set xrange ["1" : "6"]
+	set format x "% g"
+	set format y "% g"
+	set xlabel "Mes"
+	set ylabel "Colones"
+	set terminal png
+	set output " $SALIDA_GRAFICA "
+	plot "agua.dat" using 1:2 with lines title "Consumo Agua", "luz.dat" using 1:2 with linespoints title "Consumo Elctrico"
  
-	echo ""
+EOF
+echo "Se ha creado el GRÁFICO en el archivo $SALIDA_GRAFICA "
+exit 0
+
+else
+        echo ""
+        echo "Archivos para graficar NO existen. Ejecuta opción 1 primero"
+        echo ""
+fi
 
 }
 
@@ -108,8 +127,8 @@ function menu {
 echo ""
 echo "Para seleccionar una de las siguientes opciones, digite: "
 echo " 1- Para realizar una conversión de archivos Excel a CSV "
-echo " 2- Para Graficar 3 meses de consumo eléctrico "
-echo " 3- Para Graficar 6 meses de consumo de agua "
+echo " 2- Para Graficar consumo eléctrico y de agua "
+# echo " 3-
 echo " 0- Para SALIR "
 # Se captura lo que digita el usuario y se guarda en variable NUM
 echo -n "Su selección es: ";	read NUM
@@ -122,7 +141,7 @@ case $NUM in
 		 xlsTOcsv
 	;;
 	2)
-		echo "Selección inválida. Vuelva a seleccionar "
+		graficar
 	;;
 	0)
 		echo "Ha seleccionado SALIR"
@@ -139,6 +158,6 @@ OPCION=true
 # Inicia ciclo que se ejecuta función "menu" mientras la variable sea verdadera
 while [ ${OPCION} ]
 do
-	xlsTOcsv
+	menu
 done
 
