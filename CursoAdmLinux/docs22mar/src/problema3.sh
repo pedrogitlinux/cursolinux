@@ -53,7 +53,7 @@ for archivo in `find $DATOS -name "Datos"`
 do
 #	let M=M+1
 	echo "Dando formato al archivo de datos: $archivo"
-	cat $archivo |  awk -F "," '{print $1 " " $2 " " $6 " " $7}' | grep -v TOA5| grep -v TIMESTAMP| grep -v TS| grep -v Max| sed '1, $ s/"//g' | sed '1, $ s/,//g'  > $NUEVA_SALIDA/datos.dat
+	cat $archivo |  awk -F "," '{print $1 " " $2 " " $6 " " $7}' | grep -v TOA5| grep -v TIMESTAMP| grep -v TS| grep -v Max| sed '1, $ s/"//g' | sed '1, $ s/,//g'  > datos.dat
 #	if [ ${M} -lt ${LIMITE} ]
 #	then
 #	cat $NUEVA_SALIDA/datos.dat | grep -i Luz | sed '1, 3 s/Luz/'$M'/g' >> luz.dat
@@ -69,18 +69,20 @@ exit 0
 # 
 function graficar {
 SALIDA_GRAFICA=graficoDatos.png
-# SI los archivos existen se ejecuta, sino informa que los debe crear
-if [ -a luz.dat ] && [ -a agua.dat ]
+# SI el archivo existe se ejecuta, sino informa que los debe crear
+if [ -a datos.dat ]
 then
 	gnuplot << EOF 2> errorDatos2.log
-	set xrange [ * : * ]
-	set format x "% g"
+	set xdata time
+	set timefmt "%Y-%m-%d %H:%M:%S"
+	set xrange [ 2012-03-16 11:00:00 : 2012-05-30 22:00:00 ]
+	set format x "%m"
 	set format y "% g"
 	set xlabel "Tiempo"
 	set ylabel "Radiación"
 	set terminal png
 	set output "$SALIDA_GRAFICA"
-	plot "Datos.dat" using 1:4 with lines title "Radiación Máxima", "Datos.dat" using 1:5 with lines title "Radiación Mínima"
+	plot "datos.dat" using 1:4 with lines title "Radiación Máxima", "datos.dat" using 1:5 with lines title "Radiación Mínima"
  
 EOF
 echo "Se ha creado el GRÁFICO en el archivo $SALIDA_GRAFICA "
