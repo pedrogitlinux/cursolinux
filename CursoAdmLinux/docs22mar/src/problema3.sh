@@ -2,14 +2,12 @@
 
 # Este programa contiene 3 funciones y un ciclo WHILE:
 #
-# 1- Función "xlsTOcsv"
-#  Esta función covierte 
-#	- archivos Excel (xls) a archivos de texto (csv)
-#       - después procesa los archivos CSV para quitarle datos y dejar solo los datos útiles.
-#	- crea los archivos agua.dat y luz.dat que serán usados para graficar
+# 1- Función "datos"
+#  Esta función procesa el archivo Datos para quitarle datos y dejar solo los datos
+#  útiles y crea el archivo datos.dat que será usado para graficar
 # 2- Función "graficar"
-#  Esta función crea una gráfica con gnuplot del consumo eléctrico de los
-#  primeros 3 meses y del consumo de agua de 6 meses.
+#  Esta función crea una gráfica con gnuplot del Indice de la Radiación Máxima y 
+#  Mínima en KW/m2 entre 16/03/2012 y 30/05/2012
 # 3- Función "menu"
 #  Esta función muestra un menú y captura lo que el usuario seleccione para ejecutar una
 # de las funciones anteriores o "SALIR" de la aplicación. El menú se vuelve a mostrar
@@ -18,75 +16,52 @@
 
 
 # ------ INICIO DE FUNCION ------
-# Este script extrae archivos de excel y grafica datos
+# Este script manipula el archivo Datos y crea uno nuevo para usar para graficar
 
 function datos {
-# Variables que definen los directorios donde se leerán los archivos y donde se 
-# escribirán los nuevos
+# Variable que define el directorio donde se leerá el archivo
 DATOS=../problema3
 
-SALIDA_DATOS=$DATOS/datos_csv
-NUEVA_SALIDA=$DATOS/datos_out
-
-# SI el directorio no existe,lo crea para guardar nuevos archivos
-if [ -a $NUEVA_SALIDA ]
-then
-        echo ""
-        echo "Archivo $NUEVA_SALIDA existe. No es necesario crearlo"
-        echo ""
-else 
-	mkdir $NUEVA_SALIDA
-fi 
-
-# Variable numérica que utiliza para leer el nombre de archivos y crear nuevos, la inicializa en 0
-M=0
-
-# Inicia el ciclo FOR que lee el archivos y les quita los datos que se le indican
-# Las comas (,) de la primera fila la convierte en la palabra "Servicios" para que sea 
-# eliminada la fila.
-# Imprime solo 2 columnas y a "head" se le indica que muestre solo 2 filas
-# Incrementa contador, muestra mensaje, lee archivo y elimina comillas. La salida la envía a archivo
-# Lee los datos de los archivos para crear nuevos con datos del consumo de 
-# agua y luz.
+# Inicia el ciclo FOR que lee el archivo y le quita los datos que se le indican
+# Imprime 3 columnas y modifica la hora eliminando ":". La salida la envía a archivo
 
 for archivo in `find $DATOS -name "Datos"`
 do
 #	let M=M+1
 	echo "Dando formato al archivo de datos: $archivo"
-	cat $archivo |  awk -F "," '{print $1 " " $2 " " $6 " " $7}' | grep -v TOA5| grep -v TIMESTAMP| grep -v TS| grep -v Max| sed '1, $ s/"//g' | sed '1, $ s/,//g'  > datos.dat
-#	if [ ${M} -lt ${LIMITE} ]
-#	then
-#	cat $NUEVA_SALIDA/datos.dat | grep -i Luz | sed '1, 3 s/Luz/'$M'/g' >> luz.dat
-#	fi
-#	cat $NUEVA_SALIDA/datos-$M.out | grep -i Agua | sed '1, 6 s/Agua/'$M'/g' >> agua.dat
+	cat $archivo |  awk -F "," '{print $1 " " $6 " " $7}' | grep -v TOA5| grep -v TIMESTAMP| grep -v TS| grep -v Max| sed '1, $ s/"//g' | sed '1, $ s/,//g' | sed '1, $ s/://g' > datos.dat
+
 # La información de error que se genera se envía a error2.log
 done 2> errorDatos.log
-exit 0
+
+# Fin de la función
 }
 
 # ----- INICIO DE FUNCION -----
-# Script para graficar consumo de Agua y Luz usando Gnuplot
+# Script para graficar los índices de radiación solar máximo y mínimo usando Gnuplot
 # 
 function graficar {
 SALIDA_GRAFICA=graficoDatos.png
 # SI el archivo existe se ejecuta, sino informa que los debe crear
 if [ -a datos.dat ]
 then
+# Configura Gnuplot según los datos fuente que utiliza
 	gnuplot << EOF 2> errorDatos2.log
 	set xdata time
-	set timefmt "%Y-%m-%d %H:%M:%S"
-	set xrange [ 2012-03-16 11:00:00 : 2012-05-30 22:00:00 ]
-	set format x "%m"
+	set timefmt "%Y-%m-%d %H%M%S"
+	set xrange [ '2012-03-16 110000' : '2012-05-30 220000' ]
+	set format x "%m/%d"
 	set format y "% g"
-	set xlabel "Tiempo"
+	set xlabel "Meses 2012"
 	set ylabel "Radiación"
 	set terminal png
 	set output "$SALIDA_GRAFICA"
-	plot "datos.dat" using 1:4 with lines title "Radiación Máxima", "datos.dat" using 1:5 with lines title "Radiación Mínima"
+	plot "datos.dat" using 1:3 with lines title "Radiación Máxima", "datos.dat" using 1:4 with lines title "Radiación Mínima"
  
 EOF
 echo "Se ha creado el GRÁFICO en el archivo $SALIDA_GRAFICA "
-exit 0
+echo " "
+# exit 0
 
 else
         echo ""
@@ -137,6 +112,5 @@ OPCION=true
 while [ ${OPCION} ]
 do
 	menu
-#	datos
 done
 
